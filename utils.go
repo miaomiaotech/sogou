@@ -71,7 +71,7 @@ func WriteCookiesTo(cookies []*http.Cookie, path string) error {
 func ReadCookiesFrom(path string) ([]*http.Cookie, error) {
 	file, err := os.Open(cookiePath)
 	if err != nil {
-		return nil, fmt.Errorf("read %s error: %v", cookiePath, err)
+		return nil, err
 	}
 	defer file.Close()
 

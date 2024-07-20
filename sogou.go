@@ -29,7 +29,9 @@ func (s *Sogou) Translate(ctx context.Context, req Request) (resp *Response) {
 
 	cookies, err := ReadCookiesFrom(cookiePath)
 	if err != nil {
-		log.Printf("read cookies from %s err: %v", cookiePath, err)
+		if !os.IsNotExist(err) {
+			log.Printf("read cookies from %s err: %v", cookiePath, err)
+		}
 
 		r, _, err := sendRequest(ctx, http.MethodGet, "https://fanyi.sogou.com/", nil, func(r *http.Request) error {
 			r.Header.Set("User-Agent", UserAgent)
