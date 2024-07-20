@@ -14,7 +14,7 @@ import (
 func main() {
 	fromLang := flag.String("from", sogou.English, "source language")
 	toLang := flag.String("to", sogou.Chinese, "target language")
-	both := flag.Bool("both", false, "output both language")
+	both := flag.Bool("both", false, "output both languages")
 	flag.Parse()
 
 	text := strings.Join(flag.Args(), " ")
