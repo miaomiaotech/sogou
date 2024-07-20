@@ -58,18 +58,18 @@ func WriteCookiesTo(cookies []*http.Cookie, path string) error {
 	if err != nil {
 		return fmt.Errorf("GobEncode error: %v", err)
 	} else {
-		if err := os.MkdirAll(filepath.Dir(cookiePath), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 			return fmt.Errorf("MkdirAll error: %v", err)
 		}
-		if err := os.WriteFile(cookiePath, bs, 0644); err != nil {
-			return fmt.Errorf("write %s error: %v", cookiePath, err)
+		if err := os.WriteFile(path, bs, 0644); err != nil {
+			return fmt.Errorf("write %s error: %v", path, err)
 		}
 	}
 	return nil
 }
 
 func ReadCookiesFrom(path string) ([]*http.Cookie, error) {
-	file, err := os.Open(cookiePath)
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
