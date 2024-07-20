@@ -5,7 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/robertkrimen/otto"
 	"github.com/tidwall/gjson"
@@ -13,24 +15,37 @@ import (
 
 type Sogou struct{}
 
-var xxx = Sogou{}
+var (
+	instance   = Sogou{}
+	cookiePath = os.ExpandEnv("$HOME/.config/sogou/cookies")
+)
 
 func Translate(ctx context.Context, req *Request) (resp *Response) {
-	return xxx.Translate(ctx, *req)
+	return instance.Translate(ctx, *req)
 }
 
 func (s *Sogou) Translate(ctx context.Context, req Request) (resp *Response) {
 	resp = new(Response)
 
-	r, _, err := sendRequest(ctx, http.MethodGet, "https://fanyi.sogou.com/", nil, func(r *http.Request) error {
-		r.Header.Set("User-Agent", UserAgent)
-		return nil
-	})
+	cookies, err := ReadCookiesFrom(cookiePath)
 	if err != nil {
-		resp.Err = fmt.Errorf("notReadResp error: %v", err)
-		return
+		log.Printf("read cookies from %s err: %v", cookiePath, err)
+
+		r, _, err := sendRequest(ctx, http.MethodGet, "https://fanyi.sogou.com/", nil, func(r *http.Request) error {
+			r.Header.Set("User-Agent", UserAgent)
+			return nil
+		})
+		if err != nil {
+			resp.Err = fmt.Errorf("notReadResp error: %v", err)
+			return
+		}
+		cookies = r.Cookies()
+
+		if err := WriteCookiesTo(cookies, cookiePath); err != nil {
+			resp.Err = err
+			return
+		}
 	}
-	cookies := r.Cookies()
 
 	req.ToLang = s.convertLanguage(req.ToLang)
 
@@ -61,6 +76,10 @@ func (s *Sogou) Translate(ctx context.Context, req Request) (resp *Response) {
 		return nil
 	})
 	if err != nil {
+		if err2 := os.Remove(cookiePath); err2 != nil {
+			resp.Err = fmt.Errorf("remove cookies %s error: %v", cookiePath, err2)
+			return
+		}
 		resp.Err = fmt.Errorf("readResp error: %v", err)
 		return
 	}
