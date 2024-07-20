@@ -13,6 +13,12 @@ import (
 
 type Sogou struct{}
 
+var xxx = Sogou{}
+
+func Translate(ctx context.Context, req *Request) (resp *Response) {
+	return xxx.Translate(ctx, *req)
+}
+
 func (s *Sogou) Translate(ctx context.Context, req Request) (resp *Response) {
 	resp = new(Response)
 
