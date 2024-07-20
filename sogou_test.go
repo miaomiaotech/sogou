@@ -8,9 +8,8 @@ import (
 )
 
 func TestSogouTranslate(t *testing.T) {
-	sogou := &Sogou{}
 	{
-		resp := sogou.Translate(context.Background(), Request{
+		resp := Translate(context.Background(), &Request{
 			ToLang: Chinese,
 			Text:   "test",
 		})
@@ -20,7 +19,7 @@ func TestSogouTranslate(t *testing.T) {
 	}
 
 	{
-		resp := sogou.Translate(context.Background(), Request{
+		resp := Translate(context.Background(), &Request{
 			ToLang: English,
 			Text:   "测试",
 		})
