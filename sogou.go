@@ -49,6 +49,16 @@ func (s *Sogou) Translate(ctx context.Context, req Request) (resp *Response) {
 		}
 	}
 
+	defer func() {
+		if resp.Err == nil {
+			return
+		}
+
+		if err := os.Remove(cookiePath); err != nil {
+			resp.Err = fmt.Errorf("remove cookies %s error: %v", cookiePath, err)
+		}
+	}()
+
 	req.ToLang = s.convertLanguage(req.ToLang)
 
 	sign, err := s.calSign("auto", req.ToLang, req.Text)
@@ -78,10 +88,6 @@ func (s *Sogou) Translate(ctx context.Context, req Request) (resp *Response) {
 		return nil
 	})
 	if err != nil {
-		if err2 := os.Remove(cookiePath); err2 != nil {
-			resp.Err = fmt.Errorf("remove cookies %s error: %v", cookiePath, err2)
-			return
-		}
 		resp.Err = fmt.Errorf("readResp error: %v", err)
 		return
 	}

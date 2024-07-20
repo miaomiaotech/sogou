@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/miaomiaotech/sogou"
@@ -16,7 +17,7 @@ func main() {
 	both := flag.Bool("both", false, "output both language")
 	flag.Parse()
 
-	text := flag.Arg(0)
+	text := strings.Join(flag.Args(), " ")
 
 	if text == "" {
 		bs, err := os.ReadFile("/dev/stdin")
@@ -36,7 +37,7 @@ func main() {
 		Text:     text,
 	})
 	if res.Err != nil {
-		fmt.Printf("translate err: %v\n", res.Err)
+		fmt.Printf("Translate err: %v. Please retry!\n", res.Err)
 		os.Exit(1)
 	}
 
